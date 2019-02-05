@@ -36,7 +36,7 @@ maxx = 0
 maxy = 0
 maxop = 0
 
-a = int(input("Input angka pertama : "))
-b = int(input("Input angka kedua : "))
-c = int(input("Input angka ketiga : "))
-d = int(input("Input angka keempat : "))
+a = 0;
+b = 0;
+c = 0;
+d = 0;
