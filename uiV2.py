@@ -1,6 +1,6 @@
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
+from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition, FallOutTransition
 
 a = 1
 b = 3
@@ -32,8 +32,8 @@ Builder.load_string("""
 <FileInputScreen>:
     GridLayout:
         rows: 2
-        font_size: 72
         BoxLayout:
+            rows: 2
             Label:
                 id: label1
                 text: 'Label 1'
@@ -46,8 +46,8 @@ Builder.load_string("""
             Label:
                 id: label4
                 text: 'Label 4'
-
-        BoxLayout:
+        GridLayout:
+            rows: 2
             Button:
                 text: 'Draw cards'
                 on_press:
@@ -55,18 +55,57 @@ Builder.load_string("""
                     label2.text = root.GetNumber2()
                     label3.text = root.GetNumber3()
                     label4.text = root.GetNumber4()
+                    solvebutton.disabled = False
+
+            Button:
+                id: solvebutton
+                text: 'Solve'
+                disabled: True
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'answer'
             Button:
                 text: 'Reset'
                 on_press:
-                    label1.text = 'Label 1'
-                    label2.text = 'Label 2'
-                    label3.text = 'Label 3'
-                    label4.text = 'Label 4'
+                    root.CardsReset()
+                    solvebutton.disabled = True
+
+            Button:
+                text: 'Back to menu'
+                on_press:
+                    root.CardsReset()
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'menu'
 
 <ButtonInputScreen>:
-    Label:
-        font_size: 72
-        text: 'Hello, World!'
+    GridLayout:
+        rows: 2
+        BoxLayout:
+            Label:
+                font_size: 72
+                text: 'Hello, World!'
+
+        BoxLayout:
+            Button:
+                text: 'Back to menu'
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'menu'
+
+<AnswerScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Answer : ' + root.Solve()
+        
+        Label:
+            text: 'Points : ' + root.Points()
+    
+        Button:
+            text: 'Back to menu'
+            on_press:
+                root.manager.transition.direction = 'right'
+                root.manager.current = 'menu'
 """)
 
 # Declare screens
@@ -79,6 +118,7 @@ class FileInputScreen(Screen):
     global b
     global c
     global d
+
     def GetNumber1(self):
         return str(a)
 
@@ -90,9 +130,24 @@ class FileInputScreen(Screen):
 
     def GetNumber4(self):
         return str(d)
+    
+    def CardsReset(self):
+        self.ids.label1.text = 'No card'
+        self.ids.label2.text = 'No card'
+        self.ids.label3.text = 'No card'
+        self.ids.label4.text = 'No card'
+
     pass
 
 class ButtonInputScreen(Screen):
+    pass
+
+class AnswerScreen(Screen):
+    def Solve(self):
+        return FileInputScreen().GetNumber1() + '+' + FileInputScreen().GetNumber2() + '+' + FileInputScreen().GetNumber3() + '+' + FileInputScreen().GetNumber4()
+    
+    def Points(self):
+        return str(15)
     pass
 
 # Create the screen manager
@@ -100,6 +155,7 @@ sm = ScreenManager(transition=FadeTransition())
 sm.add_widget(MenuScreen(name='menu'))
 sm.add_widget(FileInputScreen(name='fileinput'))
 sm.add_widget(ButtonInputScreen(name='buttoninput'))
+sm.add_widget(AnswerScreen(name='answer'))
 
 class TestApp(App):
 
@@ -109,3 +165,4 @@ class TestApp(App):
 
 if __name__ == '__main__':
     TestApp().run()
+
