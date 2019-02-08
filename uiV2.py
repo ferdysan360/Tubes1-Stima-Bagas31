@@ -73,43 +73,59 @@ Builder.load_string("""
 
         GridLayout:
             rows: 2
-            Button:
-                font_size: 50
-                id: drawbutton
-                text: 'Draw cards'
-                disabled: False
-                on_release:
-                    label1.text = root.GetNumber()
-                    label2.text = root.GetNumber()
-                    label3.text = root.GetNumber()
-                    label4.text = root.GetNumber()
-                    cardsleftlabel.text = root.GetCardsLeft()
-                    solvebutton.disabled = False
-                    if (root.GetNeff() == '0'): drawbutton.disabled = True
+            BoxLayout:
+                Button:
+                    font_size: 50
+                    id: drawbutton
+                    text: 'Draw cards'
+                    disabled: False
+                    on_release:
+                        label1.text = root.GetNumber()
+                        label2.text = root.GetNumber()
+                        label3.text = root.GetNumber()
+                        label4.text = root.GetNumber()
+                        cardsleftlabel.text = root.GetCardsLeft()
+                        solvebutton.disabled = False
+                        movebackbutton.disabled = False
+                        if (root.GetNeff() == '0'): drawbutton.disabled = True
+                        else: drawbutton.disabled = False
 
-            Button:
-                font_size: 50
-                id: solvebutton
-                text: 'Solve'
-                disabled: True
-                on_release:
-                    root.manager.transition.direction = 'left'
-                    root.manager.current = 'answer'
+                Button:
+                    font_size: 50
+                    id: solvebutton
+                    text: 'Solve'
+                    disabled: True
+                    on_release:
+                        root.manager.transition.direction = 'left'
+                        root.manager.current = 'answer'
 
-            Button:
-                font_size: 50
-                text: 'Reset'
-                on_release:
-                    root.CardsReset()
-                    solvebutton.disabled = True
-                    drawbutton.disabled = False
+                Button:
+                    font_size: 43
+                    multiline: True
+                    id: movebackbutton
+                    text: 'Move cards to deck'
+                    disabled: True
+                    on_release:
+                        root.MoveCardsBack()
+                        drawbutton.disabled = False
+                        if (label1.text == 'No card'): movebackbutton.disabled = True
 
-            Button:
-                font_size: 50
-                text: 'Back to menu'
-                on_release:
-                    root.manager.transition.direction = 'right'
-                    root.manager.current = 'menu'
+            BoxLayout:
+                Button:
+                    font_size: 50
+                    text: 'Reset'
+                    on_release:
+                        root.CardsReset()
+                        solvebutton.disabled = True
+                        movebackbutton.disabled = True
+                        drawbutton.disabled = False
+
+                Button:
+                    font_size: 50
+                    text: 'Back to menu'
+                    on_release:
+                        root.manager.transition.direction = 'right'
+                        root.manager.current = 'menu'
 
 <AnswerScreen>:
     BoxLayout:
@@ -148,6 +164,20 @@ class FileInputScreen(Screen):
 
     def GetCardsLeft(self):
         return 'Cards Left : ' + self.GetNeff()
+
+    def MoveCardsBack(self):
+        global data
+
+        data.append(int(self.ids.label1.text))
+        data.append(int(self.ids.label2.text))
+        data.append(int(self.ids.label3.text))
+        data.append(int(self.ids.label4.text))
+
+        self.ids.label1.text = 'No card'
+        self.ids.label2.text = 'No card'
+        self.ids.label3.text = 'No card'
+        self.ids.label4.text = 'No card'
+        self.ids.cardsleftlabel.text = self.GetCardsLeft()
 
     def CardsReset(self):
         global data
